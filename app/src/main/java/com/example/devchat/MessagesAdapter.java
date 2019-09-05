@@ -11,14 +11,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.devchat.model.MessageDTO;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.MessagesHolder> {
     static int MY_MESSAGE = 1;
     static int OTHER_MESSAGES = 2;
 
+    String currentUserId;
 
+    List<MessageDTO> messages;
     SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss a, dd-MM-yy");
+
+    MessagesAdapter(String currentUserId){
+        this.currentUserId = currentUserId;
+        messages = new ArrayList<>();
+    }
 
     @NonNull
     @Override
@@ -40,7 +50,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     public int getItemViewType(int position) {
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
-        if(position % 3 == 0){
+        if(messages.get(position).getSenderId().equals(currentUserId)){
             return MY_MESSAGE;
         }else{
             return OTHER_MESSAGES;
@@ -50,12 +60,21 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
     @Override
     public void onBindViewHolder(@NonNull MessagesHolder holder, int position) {
-        holder.bindView(new MessageDTO("Emmanuel", "Hello, Good morning, how was your night, hope you slept well", new Date()));
+        holder.bindView(messages.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 10;
+        return messages.size();
+    }
+
+    public void setData(List<MessageDTO> messages) {
+        this.messages = messages;
+        notifyDataSetChanged();
+        /*if(!messages.isEmpty()) {
+            this.messages.addAll(messages);
+            notifyItemRangeInserted(this.messages.size() - messages.size(), this.messages.size());
+        }*/
     }
 
     class MessagesHolder extends RecyclerView.ViewHolder {
@@ -73,7 +92,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         public void bindView(MessageDTO message) {
             mSendernameTextView.setText(message.getSenderName());
             mMessageTextView.setText(message.getText());
-            mDateSentTextView.setText(format.format(message.getDateSent()));
+            if(message.getDateSent() != null) {
+                mDateSentTextView.setText(format.format(message.getDateSent()));
+            }else{
+                mDateSentTextView.setText(format.format(new Date()));
+            }
         }
     }
 }

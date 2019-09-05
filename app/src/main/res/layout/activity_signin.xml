@@ -75,4 +75,27 @@
         app:layout_constraintEnd_toEndOf="@+id/password_il"
         app:layout_constraintStart_toStartOf="@+id/password_il"
         app:layout_constraintTop_toBottomOf="@+id/password_il" />
+
+    <Button
+        android:id="@+id/signup_btn"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Don't have an account? Signup here"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="@+id/login_btn"
+        app:layout_constraintStart_toStartOf="@+id/login_btn"
+        app:layout_constraintTop_toBottomOf="@+id/login_btn" />
+
+    <ProgressBar
+        android:id="@+id/loading_indicator_pb"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/signup_btn"
+        app:layout_constraintStart_toStartOf="@+id/signup_btn"
+        app:layout_constraintTop_toBottomOf="@+id/signup_btn" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

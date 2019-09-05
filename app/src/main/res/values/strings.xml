@@ -2,4 +2,6 @@
     <string name="app_name">DevChat</string>
     <string name="action_settings">Settings</string>
     <string name="message_edit_text_hint">Type a text</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_edit_profile">Edit Profile</string>
 </resources>
