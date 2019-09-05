@@ -1,8 +1,5 @@
 package com.example.devchat.model;
 
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.ServerTimestamp;
-
 import java.util.Date;
 
 public class MessageDTO {
@@ -10,7 +7,6 @@ public class MessageDTO {
     private String senderName;
     private String text;
 
-    @ServerTimestamp
     private Date dateSent;
 
     public MessageDTO(){}

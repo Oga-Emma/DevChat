@@ -12,15 +12,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,10 +39,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    private FirebaseUser currentUser;
-    private FirebaseFirestore mFirestore;
-
     MessagesAdapter mAdapter;
     RecyclerView mRecyclerView;
     Toolbar toolbar;
@@ -81,25 +68,11 @@ public class MainActivity extends AppCompatActivity {
         sendingProgress = findViewById(R.id.sending_progress);
         sendingProgress.setVisibility(View.INVISIBLE);
 
-        mAuth = FirebaseAuth.getInstance();
-        mFirestore = FirebaseFirestore.getInstance();
-
-        mAdapter = new MessagesAdapter(mAuth.getCurrentUser().getUid());
-        mRecyclerView = findViewById(R.id.chat_rv);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(mAdapter);
-
         FloatingActionButton fab = findViewById(R.id.send_btn);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                hideKeyboard(MainActivity.this);
-                String text = mMessageET.getText().toString();
-                if(!TextUtils.isEmpty(text)){
-                    sendingProgress.setVisibility(View.VISIBLE);
-                    MessageDTO message = new MessageDTO(currentUser.getUid(), currentUser.getDisplayName(), text);
-                    sendMessage(message);
-                }
+
             }
         });
     }
@@ -107,29 +80,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        currentUser = mAuth.getCurrentUser();
-        if(currentUser == null){
-            Intent signinScreenIntent = new Intent(this, SigninActivity.class);
-            startActivity(signinScreenIntent);
-            finish();
-        }else{
-            if(currentUser.getDisplayName() == null || currentUser.getDisplayName().isEmpty()){
-                Intent signinScreenIntent = new Intent(this, ProfileSetupActivity.class);
-                startActivity(signinScreenIntent);
-            }else{
-                mDisplayNameTV.setText(currentUser.getDisplayName());
-                Uri imageUrl = currentUser.getPhotoUrl();
-
-                if(imageUrl != null){
-                    Glide.with(this)
-                            .load(imageUrl)
-                            .into(mProfileIV);
-                }
-
-                startListeningForMessages();
-            }
-        }
-
 
     }
 
@@ -149,63 +99,12 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_edit_profile) {
-            Intent signinScreenIntent = new Intent(this, ProfileSetupActivity.class);
-            startActivity(signinScreenIntent);
             return true;
         }else if (id == R.id.action_logout) {
-            mAuth.signOut();
-            Intent signinScreenIntent = new Intent(this, SigninActivity.class);
-            startActivity(signinScreenIntent);
-            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void startListeningForMessages() {
-        mFirestore.collection("messages")
-                .orderBy("dateSent")
-                .addSnapshotListener(this, new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-
-                        if(e != null){
-                            //an error has occured
-                        }else{
-                            List<MessageDTO> messages = snapshots.toObjects(MessageDTO.class);
-//                            ArrayList<MessageDTO> messages = new ArrayList<>();
-
-//                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
-//                                if (dc.getType() == DocumentChange.Type.ADDED) {
-////                                    Log.d(TAG, "New city: " + dc.getDocument().getData());
-//                                    messages.add(dc.getDocument().toObject(MessageDTO.class));
-//
-//                                }
-//                            }
-
-                            mAdapter.setData(messages);
-                            mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
-                        }
-                    }
-                });
-    }
-
-    private void sendMessage(MessageDTO message){
-        mFirestore.collection("messages")
-                .add(message)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        sendingProgress.setVisibility(View.INVISIBLE);
-                        if(!task.isSuccessful()){
-                            Toast.makeText(MainActivity.this, "Message sending failed", Toast.LENGTH_SHORT).show();
-                        }else{
-                            mMessageET.setText("");
-                        }
-                    }
-                });
     }
 
     public static void hideKeyboard(Activity activity) {

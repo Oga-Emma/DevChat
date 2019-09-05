@@ -16,13 +16,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class SignupActivity extends AppCompatActivity {
     private final String TAG = SignupActivity.class.getSimpleName();
-    private FirebaseAuth mAuth;
 
     TextInputEditText mEmailEditText, mPasswordEditText, mConfirmPasswordEditText;
     TextInputLayout mEmailInputLayout, mPasswordInputLayout, mConfirmPasswordInputLayout;
@@ -32,9 +28,6 @@ public class SignupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
 
         mEmailEditText  = findViewById(R.id.email_et);
         mEmailInputLayout= findViewById(R.id.email_iL);
@@ -89,30 +82,5 @@ public class SignupActivity extends AppCompatActivity {
 
     private void signup(String email, String password) {
 
-        mLoadingIndicatorProgress.setVisibility(View.VISIBLE);
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        mLoadingIndicatorProgress.setVisibility(View.INVISIBLE);
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-
-                            Intent mainActivityIntent = new Intent(SignupActivity.this, MainActivity.class);
-                            startActivity(mainActivityIntent );
-                            finish();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignupActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-
-                        }
-
-                        // ...
-                    }
-                });
     }
 }
